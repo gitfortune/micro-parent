@@ -43,20 +43,11 @@ logging:
 swagger: 
   enable: true
 
-# ffmpeg存放路径，mp4,mp3转码后提供给wowza使用的存放路径。
-file:
-  ffmpeg:
-    path: E:/software/ffmpeg/bin/ffmpeg.exe
-  videoMp4:
-    path: E:/videoMp4/
-  audioMp3:
-    path: E:/audioMp3/
-
 convert:
   ffmpeg: E:/software/ffmpeg/bin/ffmpeg.exe      #ffmpeg路径
   videoTemp: E:/videoMp4/   # 转码后临时存放视频路径
   aideoTemp: E:/audioMp3/   # 转码后临时存放音频路径
-  SeparateSize: 50          # 单位：M
+  SeparateSize: 50          # 单位：M。转码后文件是保存到原文件的同级目录下，还是放到wowza指定目录下的 分界线
   content: E:/WOWZA/      #WOWZA VOD指定路径
 
 

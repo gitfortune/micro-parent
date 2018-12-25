@@ -7,8 +7,10 @@ import com.company.project.resource.entity.MediaInfo;
 import com.company.project.resource.exception.ConvertException;
 import com.company.project.resource.utils.CheckFileTypeUtil;
 import com.company.project.resource.utils.FileUtil;
+import com.company.project.resource.utils.ImageUtil;
 import com.company.project.resource.utils.XuggleUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,7 @@ public class ConvertService {
         String tempPath = null;
         String descPath = null;
         //先判断文件格式
-        if(fileType == CheckFileTypeUtil.VIDEO){
+        if(fileType == CheckFileTypeUtil.VIDEO){ //视频
 
             tempPath = this.videoTranscoding(processFileDTO);
             //转码完成后，获取文件信息
@@ -51,12 +53,12 @@ public class ConvertService {
                 }
                 descPath = properties.getContent()+fileName;
             }
-        }else if (fileType == CheckFileTypeUtil.AUDIO){
+        }else if (fileType == CheckFileTypeUtil.AUDIO){ //音频
             tempPath = this.aideoTranscoding(processFileDTO);
             String fileName = tempPath.substring(tempPath.lastIndexOf("/")+1);
             descPath = filePath.substring(0, filePath.lastIndexOf("/")+1) + fileName;
-        }else if(fileType == CheckFileTypeUtil.PICTURE){
-            //图片处理
+        }else if(fileType == CheckFileTypeUtil.PICTURE){ //图片
+            this.picProcess(processFileDTO);
 
         }
         log.info("最终路径：{}",descPath);
@@ -69,13 +71,22 @@ public class ConvertService {
 
     /**
      * 图片处理
-     * @param filePath
-     * @param waterMarkPath
      * @param processFileDTO
      * @return
      */
-    public String picProcess(String filePath, String waterMarkPath, ProcessFileDTO processFileDTO){
+    public String picProcess(ProcessFileDTO processFileDTO){
 
+        //如果没有水印图片地址，则是裁剪图片
+        if(StringUtils.isBlank(processFileDTO.getWaterMarkPath())){
+            String srcImg = processFileDTO.getFilePath();
+            int x = processFileDTO.getX();
+            int y = processFileDTO.getY();
+            int cutWidth = processFileDTO.getCutWidth();
+            int cutHeight = processFileDTO.getCutHeight();
+            //缩放比例
+            float scale = processFileDTO.getScale() == 0f ? 1f : processFileDTO.getScale();
+            ImageUtil.cutImage(srcImg,"",x,y,cutWidth,cutHeight,scale);
+        }
         return "";
     }
 

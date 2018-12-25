@@ -12,6 +12,9 @@ public class ProcessFileDTO {
     @ApiModelProperty("音、视频，图片参数，文件原路径")
     private String filePath;
 
+    @ApiModelProperty("水印图片参数，水印图片路径")
+    private String waterMarkPath;
+
     @ApiModelProperty("音、视频，图片参数，缩放比例，默认不缩放")
     private float scale;
 
@@ -35,8 +38,5 @@ public class ProcessFileDTO {
 
     @ApiModelProperty("水印图片参数，透明度，默认不透明")
     private float transparency;
-
-    @ApiModelProperty("水印图片参数，水印图片路径")
-    private String waterMarkPath;
 
 }

@@ -20,13 +20,13 @@ public class FileUtil {
     /**
      * 将文件移动到指定目录
      * @param src   源文件路径
-     * @param desc 目标文件路径
+     * @param dest 目标文件路径
      */
-    public static void move(String src,String desc){
+    public static void move(String src,String dest){
 
         long startTime2 = System.currentTimeMillis(); //获取开始时间
         Path path = Paths.get(src);
-        Path outPath = Paths.get(desc);
+        Path outPath = Paths.get(dest);
         try {
             Files.move(path, outPath, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
@@ -38,7 +38,7 @@ public class FileUtil {
     }
 
 
-    //传输慢
+    /*//传输慢
     public static void moveSlow(String src,String desc){
         long startTime = System.currentTimeMillis(); //获取开始时间
         File inputFile = new File(src);
@@ -64,5 +64,5 @@ public class FileUtil {
         }
         long endTime = System.currentTimeMillis(); //获取结束时间
         log.info("channel程序运行时间：" + (endTime - startTime) + "ms"); //输出程序运行时间
-    }
+    }*/
 }
