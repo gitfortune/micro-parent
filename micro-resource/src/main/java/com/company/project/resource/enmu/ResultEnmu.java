@@ -17,11 +17,10 @@ public enum ResultEnmu {
 
     XUGGLE_FAIL(6,"Xuggle打开媒体文件失败"),
 
-
-
-
+    FILE_MOVE_FAIL(7,"移动文件到指定目录失败"),
 
     ;
+
 
 
 

@@ -1,5 +1,7 @@
 package com.company.project.resource.utils;
 
+import com.company.project.resource.enmu.ResultEnmu;
+import com.company.project.resource.exception.ConvertException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -21,16 +23,18 @@ public class FileUtil {
      * @param desc 目标文件路径
      */
     public static void move(String src,String desc){
+
         long startTime2 = System.currentTimeMillis(); //获取开始时间
         Path path = Paths.get(src);
         Path outPath = Paths.get(desc);
         try {
             Files.move(path, outPath, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("移动文件到指定目录失败:{}",e.getMessage());
+            throw new ConvertException(ResultEnmu.FILE_MOVE_FAIL);
         }
         long endTime2 = System.currentTimeMillis(); //获取结束时间
-        System.out.println("Files程序运行时间：" + (endTime2 - startTime2) + "ms"); //输出程序运行时间
+        log.info("Files程序运行时间：" + (endTime2 - startTime2) + "ms"); //输出程序运行时间
     }
 
 
@@ -59,9 +63,6 @@ public class FileUtil {
             }
         }
         long endTime = System.currentTimeMillis(); //获取结束时间
-        System.out.println("channel程序运行时间：" + (endTime - startTime) + "ms"); //输出程序运行时间
-
-
-
+        log.info("channel程序运行时间：" + (endTime - startTime) + "ms"); //输出程序运行时间
     }
 }
