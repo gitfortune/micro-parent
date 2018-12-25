@@ -1,13 +1,62 @@
 package com.company.project.resource.utils;
 
+import com.company.project.resource.enmu.ResultEnmu;
+import com.company.project.resource.entity.MediaInfo;
+import com.company.project.resource.exception.ConvertException;
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
 
+import java.math.BigDecimal;
+
 public class XuggleUtil {
 
-    private static final String filename = "";
+
+    /**
+     * 获取媒体文件信息
+     * @param filePath 文件路径
+     * @return
+     */
+    public static MediaInfo getMediaInfo(String filePath){
+        MediaInfo mediaInfo = new MediaInfo();
+        // first we create a Xuggler container object
+        IContainer container = IContainer.make();
+
+        int result = container.open(filePath, IContainer.Type.READ, null);
+
+        // check if the operation was successful
+        if (result<0){
+            throw new ConvertException(ResultEnmu.XUGGLE_FAIL);
+        }
+
+        long size = container.getFileSize();
+        //精确到后两位
+        BigDecimal b = new BigDecimal(size / 1024f / 1024f);
+        float fileSize = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+        mediaInfo.setFileSize(fileSize);
+
+        // query how many streams the call to open found
+        int numStreams = container.getNumStreams();
+        for (int i=0; i<numStreams; i++) {
+            // find the stream object
+            IStream stream = container.getStream(i);
+
+            // get the pre-configured decoder that can decode this stream;
+            IStreamCoder coder = stream.getStreamCoder();
+            if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_VIDEO) {
+                mediaInfo.setHeight(coder.getHeight());
+                mediaInfo.setWidth(coder.getWidth());
+            }
+
+        }
+        container.close();
+        return mediaInfo;
+    }
+
+
+
+    private static final String filename = "E:/videoMp4/13、spring boot使用thymeleaf_标清.mp4";
 
     public static void main(String[] args) {
 
@@ -27,7 +76,7 @@ public class XuggleUtil {
         // query for the total duration
         long duration = container.getDuration();
 
-        // query for the file size
+        // query for the file size，视频大小
         long fileSize = container.getFileSize();
 
         // query for the bit rate
@@ -35,7 +84,8 @@ public class XuggleUtil {
 
         System.out.println("Number of streams: " + numStreams);
         System.out.println("Duration (ms): " + duration);
-        System.out.println("File Size (bytes): " + fileSize);
+        System.out.println("文件大小: " + fileSize/1024f/1024f+"M");
+        System.out.println("文件大小: " + (float)Math.round((fileSize / 1024f / 1024f) * 100) / 100+"M");
         System.out.println("Bit Rate: " + bitRate);
 
         // iterate through the streams to print their meta data
@@ -46,7 +96,6 @@ public class XuggleUtil {
 
             // get the pre-configured decoder that can decode this stream;
             IStreamCoder coder = stream.getStreamCoder();
-
             System.out.println("*** Start of Stream Info ***");
 
             System.out.printf("stream %d: ", i);
@@ -73,7 +122,6 @@ public class XuggleUtil {
                 System.out.printf("format: %s; ", coder.getPixelType());
                 System.out.printf("frame-rate: %5.2f; ", coder.getFrameRate().getDouble());
             }
-            System.out.println();
             System.out.println("*** End of Stream Info ***");
 
         }

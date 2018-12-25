@@ -26,9 +26,9 @@ public class ConvertProperties {
     public String aideoTemp;
 
     /**
-     *  决定转码后文件是保存到原文件的同级目录下，还是放到wowza指定目录下的 分隔标准
+     *  决定转码后文件是保存到原文件的同级目录下，还是放到wowza指定目录下的 分界线
      */
-    public String SeparateSize;
+    public float SeparateSize;
 
     /**
      * WOWZA ,VOD指定路径

@@ -53,11 +53,11 @@ file:
     path: E:/audioMp3/
 
 convert:
-  ffmpeg: xxxxx      #ffmpeg路径
-  videoTemp: xxxxx   # 转码后临时存放视频路径
-  aideoTemp: xxxxx   # 转码后临时存放音频路径
-  SeparateSize: 50M
-  content: xxxxx      #WOWZA VOD指定路径
+  ffmpeg: E:/software/ffmpeg/bin/ffmpeg.exe      #ffmpeg路径
+  videoTemp: E:/videoMp4/   # 转码后临时存放视频路径
+  aideoTemp: E:/audioMp3/   # 转码后临时存放音频路径
+  SeparateSize: 500          # 单位：M
+  content: E:/WOWZA/      #WOWZA VOD指定路径
 
 
 

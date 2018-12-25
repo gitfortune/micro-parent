@@ -15,6 +15,8 @@ public enum ResultEnmu {
 
     FILE_NOT_FOUND(5,"找不到该文件"),
 
+    XUGGLE_FAIL(6,"Xuggle打开媒体文件失败"),
+
 
 
 
