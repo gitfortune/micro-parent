@@ -25,11 +25,11 @@ public class FileUtil {
     public static void move(String src,String dest){
 
         long startTime2 = System.currentTimeMillis(); //获取开始时间
-        Path path = Paths.get(src);
-        Path outPath = Paths.get(dest);
         try {
+            Path path = Paths.get(src);
+            Path outPath = Paths.get(dest);
             Files.move(path, outPath, StandardCopyOption.ATOMIC_MOVE);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("移动文件到指定目录失败:{}",e.getMessage());
             throw new ConvertException(ResultEnmu.FILE_MOVE_FAIL);
         }

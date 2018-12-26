@@ -10,6 +10,7 @@ import com.company.project.resource.utils.FileUtil;
 import com.company.project.resource.utils.ImageUtil;
 import com.company.project.resource.utils.XuggleUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 音视频转码服务，图片处理
@@ -58,16 +60,33 @@ public class ConvertService {
             String fileName = tempPath.substring(tempPath.lastIndexOf("/")+1);
             descPath = filePath.substring(0, filePath.lastIndexOf("/")+1) + fileName;
         }else if(fileType == CheckFileTypeUtil.PICTURE){ //图片
-            this.picProcess(processFileDTO);
-
+            descPath = this.picProcess(processFileDTO);
+            return descPath;
         }
         log.info("最终路径：{}",descPath);
         FileUtil.move(tempPath,descPath);
         return descPath;
     }
 
-
-
+    /**
+     * 检查大小，然后根据大小移动到指定位置
+     * @param processFileDTO
+     */
+    public void checkSizeAndMove(ProcessFileDTO processFileDTO){
+        String filePath = processFileDTO.getFilePath();
+        String fileName = new File(filePath).getName();
+        MediaInfo mediaInfo = XuggleUtil.getMediaInfo(filePath);
+        //文件大于指定大小，存到WOWZA指定目录下，否则不做处理
+        if(mediaInfo.getFileSize() > properties.getSeparateSize()){
+            //如果大于指定大小，上传到WOWZA。
+            File file = new File(properties.getContent());
+            if(!file.exists()){
+                file.mkdir();
+            }
+            String descPath = properties.getContent()+fileName;
+            FileUtil.move(filePath,descPath);
+        }
+    }
 
     /**
      * 图片处理
@@ -75,19 +94,29 @@ public class ConvertService {
      * @return
      */
     public String picProcess(ProcessFileDTO processFileDTO){
-
+        //目前只有加水印和裁剪需求，所以暂时这样处理，以后根据新需求完善
+        String srcImg = processFileDTO.getFilePath();
+        String fileName = new File(srcImg).getName();
+        String uuid = UUID.randomUUID().toString().replace("-", ""); //UUID
+        String targerImg = srcImg.replace(fileName,uuid);
+        //水印图片位置
+        Positions positions = ImageUtil.checkPositions(processFileDTO.getPosition());
+        String waterMarkPath = processFileDTO.getWaterMarkPath();   //水印路径
+        String newImg;
+        //缩放比例
+        float scale = processFileDTO.getScale() == 0f ? 1f : processFileDTO.getScale();
         //如果没有水印图片地址，则是裁剪图片
-        if(StringUtils.isBlank(processFileDTO.getWaterMarkPath())){
-            String srcImg = processFileDTO.getFilePath();
+        if(StringUtils.isBlank(waterMarkPath)){
             int x = processFileDTO.getX();
             int y = processFileDTO.getY();
             int cutWidth = processFileDTO.getCutWidth();
             int cutHeight = processFileDTO.getCutHeight();
-            //缩放比例
-            float scale = processFileDTO.getScale() == 0f ? 1f : processFileDTO.getScale();
-            ImageUtil.cutImage(srcImg,"",x,y,cutWidth,cutHeight,scale);
+            newImg = ImageUtil.cutImage(srcImg,targerImg,x,y,cutWidth,cutHeight,scale);
+        }else{
+            float opacity = processFileDTO.getOpacity() == 0f ? 1f : processFileDTO.getOpacity();
+            newImg = ImageUtil.putWaterMarker(srcImg,targerImg,waterMarkPath,positions,scale,opacity);
         }
-        return "";
+        return newImg;
     }
 
 

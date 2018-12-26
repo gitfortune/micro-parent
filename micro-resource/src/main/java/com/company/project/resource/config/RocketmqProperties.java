@@ -9,22 +9,16 @@
 package com.company.project.resource.config;
 
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Data
 @Component
 @ConfigurationProperties(RocketmqProperties.PREFIX)
 public class RocketmqProperties {
 	public static final String PREFIX = "apache.rocketmq";
 	
 	private String namesrvAddr;
-	
-	public String getNamesrvAddr() {
-		return namesrvAddr;
-	}
-	public void setNamesrvAddr(String namesrvAddr) {
-		this.namesrvAddr = namesrvAddr;
-	}
 
-	
 }

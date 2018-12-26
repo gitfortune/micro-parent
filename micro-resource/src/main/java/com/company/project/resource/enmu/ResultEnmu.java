@@ -19,6 +19,8 @@ public enum ResultEnmu {
 
     FILE_MOVE_FAIL(7,"移动文件到指定目录失败"),
 
+    THUMBNAILS_FAIL(8,"图片处理失败"),
+
     ;
 
 

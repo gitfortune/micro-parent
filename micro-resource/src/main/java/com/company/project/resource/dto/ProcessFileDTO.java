@@ -37,6 +37,6 @@ public class ProcessFileDTO {
     private int position;
 
     @ApiModelProperty("水印图片参数，透明度，默认不透明")
-    private float transparency;
+    private float opacity;
 
 }

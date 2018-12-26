@@ -34,14 +34,12 @@ public class ConvertController {
             convertService.process(fileType,processFileDTO);
 
         }else if(fileType == CheckFileTypeUtil.EXPECT){
-            //MP3，MP4格式，不需要转码，如果大于50M存入指定路径
-            log.info("上传到xxx路径下");
-
+            //MP3，MP4格式，不需要转码，如果大于xx M存入指定路径
+            convertService.checkSizeAndMove(processFileDTO);
         }else {
             //无法处理的未知类型
             throw new ConvertException(ResultEnmu.UNIDENTIFIED);
         }
-
         return RestResponse.success();
     }
 
