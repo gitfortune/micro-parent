@@ -21,6 +21,8 @@ public enum ResultEnmu {
 
     THUMBNAILS_FAIL(8,"图片处理失败"),
 
+    MQ_SEND_MSG_FAIL(9,"MQ发送消息失败"),
+
     ;
 
 

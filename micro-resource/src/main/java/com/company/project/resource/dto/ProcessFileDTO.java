@@ -5,9 +5,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @ApiModel(value = "ProcessFileDTO", description = "包含音、视频，图片转换时用到的参数")
-public class ProcessFileDTO {
+public class ProcessFileDTO implements Serializable {
+
+    private static final long serialVersionUID = -1014275523650146132L;
 
     @ApiModelProperty("音、视频，图片参数，文件原路径")
     private String filePath;

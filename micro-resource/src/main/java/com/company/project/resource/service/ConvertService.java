@@ -30,6 +30,27 @@ public class ConvertService {
     @Autowired
     ConvertProperties properties;
 
+    public void consumerMsg(ProcessFileDTO processFileDTO){
+        log.info("开始处理业务");
+        String filePath = processFileDTO.getFilePath();
+
+        int fileType = CheckFileTypeUtil.checkType(CheckFileTypeUtil.getFileHeader(filePath));
+
+        //如果是音、视频，图片，进入处理程序
+        if(fileType != CheckFileTypeUtil.UNKNOWN && fileType != CheckFileTypeUtil.EXPECT){
+
+            this.process(fileType,processFileDTO);
+
+        }else if(fileType == CheckFileTypeUtil.EXPECT){
+            //MP3，MP4格式，不需要转码，如果大于xx M存入指定路径
+            this.checkSizeAndMove(processFileDTO);
+        }else {
+            //无法处理的未知类型
+            throw new ConvertException(ResultEnmu.UNIDENTIFIED);
+        }
+    }
+
+
     public String process(int fileType,ProcessFileDTO processFileDTO) {
 
         String filePath = processFileDTO.getFilePath();

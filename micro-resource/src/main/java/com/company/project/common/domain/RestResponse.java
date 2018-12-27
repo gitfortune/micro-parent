@@ -49,7 +49,7 @@ public class RestResponse<T> {
 	}
 
 	public RestResponse() {
-		this(0, "");
+		this(0, "操作成功");
 	}
 
 	public RestResponse(int code, String msg) {
