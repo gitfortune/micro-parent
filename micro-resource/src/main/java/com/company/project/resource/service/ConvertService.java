@@ -30,27 +30,49 @@ public class ConvertService {
     @Autowired
     ConvertProperties properties;
 
+    /**
+     * 转码前的判断
+     * @param processFileDTO
+     */
     public void consumerMsg(ProcessFileDTO processFileDTO){
-        log.info("开始处理业务");
+
         String filePath = processFileDTO.getFilePath();
 
+        //使用checkType（）方法无法区分avi和wav，需要另作处理
         int fileType = CheckFileTypeUtil.checkType(CheckFileTypeUtil.getFileHeader(filePath));
-
+        if(fileType == CheckFileTypeUtil.CONFUSING){
+            String sub = filePath.substring(filePath.lastIndexOf(".")+1);
+            if("avi".equals(sub)){
+                fileType = CheckFileTypeUtil.VIDEO;
+            }else if("wav".equals(sub)){
+                fileType = CheckFileTypeUtil.AUDIO;
+            }
+        }
+        log.info("开始处理业务");
         //如果是音、视频，图片，进入处理程序
         if(fileType != CheckFileTypeUtil.UNKNOWN && fileType != CheckFileTypeUtil.EXPECT){
 
-            this.process(fileType,processFileDTO);
+            String newPath = this.process(fileType, processFileDTO);
+            //回调
 
         }else if(fileType == CheckFileTypeUtil.EXPECT){
             //MP3，MP4格式，不需要转码，如果大于xx M存入指定路径
             this.checkSizeAndMove(processFileDTO);
         }else {
+            //回调
+
             //无法处理的未知类型
+            log.error("转码服务：无法处理的未知类型：{}",filePath);
             throw new ConvertException(ResultEnmu.UNIDENTIFIED);
         }
     }
 
-
+    /**
+     * 转码业务处理
+     * @param fileType
+     * @param processFileDTO
+     * @return
+     */
     public String process(int fileType,ProcessFileDTO processFileDTO) {
 
         String filePath = processFileDTO.getFilePath();
@@ -147,6 +169,11 @@ public class ConvertService {
      * @return
      */
     public String videoTranscoding(ProcessFileDTO processFileDTO){
+        float scale = processFileDTO.getScale();    //缩放比例
+        String rate = processFileDTO.getRate();     //码率
+        int height;
+        int width;
+
         File dire = new File(properties.getVideoTemp());
         if(!dire.exists()){
             dire.mkdir();
@@ -163,15 +190,29 @@ public class ConvertService {
         commend.add("-y");  //如果有重名，覆盖掉
         commend.add("-loglevel");
         commend.add("quiet");
-//        commend.add("-threads"); // 开启两个线程，实测速度变慢，弃用
-//        commend.add("2");
 //        commend.add("-c:v");
 //        commend.add("libx264");
-//        commend.add("-s");
-//        commend.add("960x540");
+
+        if(StringUtils.isNotBlank(rate)){
+            commend.add("-b:v");
+            commend.add(rate+"k");
+            commend.add("-bufsize");
+            commend.add(rate+"k");
+        }
+//        -minrate ,-maxrate 在线视频有时候，希望码率波动，不要超过一个阈值，可以设置maxrate。
+//        commend.add("-maxrate");
+//        commend.add("2500k");
+
+        if(scale != 0){
+            //说明需要改变视频分辨率
+            MediaInfo mediaInfo = XuggleUtil.getMediaInfo(processFileDTO.getFilePath());
+            height = (int) (mediaInfo.getHeight() * scale);
+            width = (int) (mediaInfo.getWidth()* scale);
+            commend.add("-s");
+            commend.add(width+"x"+height);
+        }
         commend.add(outputPath);
         try {
-
             ProcessBuilder builder = new ProcessBuilder();
             builder.command(commend);
             Process process = builder.start();
@@ -190,6 +231,7 @@ public class ConvertService {
      * @return
      */
     public String aideoTranscoding(ProcessFileDTO processFileDTO) {
+        String rate = processFileDTO.getRate();     //码率
         File dire = new File(properties.getAideoTemp());
         if(!dire.exists()){
             dire.mkdir();
@@ -208,6 +250,12 @@ public class ConvertService {
         commend.add("quiet");
 //        commend.add("-c:v");
 //        commend.add("libx264");
+        if(StringUtils.isNotBlank(rate)){
+            commend.add("-b:v");
+            commend.add(rate+"k");
+            commend.add("-bufsize");
+            commend.add(rate+"k");
+        }
         commend.add(outputPath);
         try {
 

@@ -5,7 +5,10 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.company.project.resource.dto.ProcessFileDTO;
+import com.company.project.resource.enmu.ResultEnmu;
+import com.company.project.resource.exception.ConvertException;
 import com.company.project.resource.service.ConvertService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -75,7 +78,11 @@ public class RocketmqConfiguration{
 	                    for (MessageExt messageExt : msgs) {
 	                        String messageBody = new String(messageExt.getBody(), "utf-8");
 	                        logger.info("转码服务,消费消息：Msg: " + messageExt.getMsgId() + ",msgBody: " + messageBody);//输出消息内容
+							if(StringUtils.isBlank(messageBody)){
+								throw new ConvertException(ResultEnmu.MQ_MESSAGE_IS_NULL);
+							}
 							ProcessFileDTO processFileDTO = JSON.parseObject(messageBody, ProcessFileDTO.class);
+							//转码处理
 							convertService.consumerMsg(processFileDTO);
 	                    }
 	                } catch (Exception e) {

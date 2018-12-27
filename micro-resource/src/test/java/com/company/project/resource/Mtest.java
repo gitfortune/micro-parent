@@ -15,5 +15,8 @@ public class Mtest {
     @Test
     public void test1(){
 
+        String str = "xxxx/xxxx/xxxx.jpg";
+        String substring = str.substring(str.lastIndexOf(".")+1);
+        log.info(substring);
     }
 }

@@ -24,6 +24,8 @@ public class CheckFileTypeUtil {
     public static final int AUDIO = 3;
     /**图片*/
     public static final int PICTURE = 4;
+    /**使用checkType（）方法无法区分avi和wav，先标记为容易混淆的，另作处理 */
+    public static final int CONFUSING = 5;
 
 
     /**
@@ -113,7 +115,7 @@ public class CheckFileTypeUtil {
             case "664C6143":    //flac
                 return AUDIO;
             case "52494646":    //wav,avi
-                return AUDIO;
+                return CONFUSING;
             case "FFF15080":    //aac
                 return AUDIO;
             case "4D546864":    //mid

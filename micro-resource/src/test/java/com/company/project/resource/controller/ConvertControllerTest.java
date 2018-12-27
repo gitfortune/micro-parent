@@ -55,7 +55,44 @@ public class ConvertControllerTest {
                 //返回请求的字符串信息
                 .andReturn().getResponse().getContentAsString();
         log.info("测试结果：{}",result);
+
+
+    }
+
+    @Test
+    public void test(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                plus();
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }).start();
     }
 
 
+    public void plus(){
+        int i = 0;
+        System.out.println(i++);
+    }
 }

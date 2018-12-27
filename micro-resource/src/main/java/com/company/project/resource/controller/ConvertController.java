@@ -30,7 +30,10 @@ public class ConvertController {
     private DefaultMQProducer defaultMQProducer;
 
     @RequestMapping("/convert_file")
-    public RestResponse convertFile(@RequestBody ProcessFileDTO processFileDTO){
+    public RestResponse convertFile(ProcessFileDTO processFileDTO){
+        if(null == processFileDTO){
+            throw new ConvertException(ResultEnmu.OBJ_IS_NULL);
+        }
         try {
             String msg = JSON.toJSONString(processFileDTO);
 

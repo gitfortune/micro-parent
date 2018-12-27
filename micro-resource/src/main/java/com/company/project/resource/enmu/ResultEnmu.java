@@ -23,6 +23,10 @@ public enum ResultEnmu {
 
     MQ_SEND_MSG_FAIL(9,"MQ发送消息失败"),
 
+    MQ_MESSAGE_IS_NULL(10,"消息为空，不能进行业务处理"),
+
+    OBJ_IS_NULL(11,"传递数据为空，不能继续发送消息"),
+
     ;
 
 
