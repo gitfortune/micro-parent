@@ -35,6 +35,8 @@ eureka:
     lease-expiration-duration-in-seconds: 10 # 续约到期时间（默认90秒）
   client:
     registry-fetch-interval-seconds: 5 # 抓取服务列表
+    register-with-eureka: false   #是否将自己注册到Eureka Server上，默认为true
+    fetch-registry: false   #是否从Eureka Server上获取注册信息，默认为true
 
 #endpoints:
 #  health:

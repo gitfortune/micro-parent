@@ -82,11 +82,15 @@ public class RocketmqConfiguration{
 								throw new ConvertException(ResultEnmu.MQ_MESSAGE_IS_NULL);
 							}
 							ProcessFileDTO processFileDTO = JSON.parseObject(messageBody, ProcessFileDTO.class);
+							//如果filePath中没有值，这条消息无用，返回消费成功，不再消费
+							if(StringUtils.isBlank(processFileDTO.getFilePath())){
+								return ConsumeConcurrentlyStatus.CONSUME_SUCCESS; //消费成功
+							}
 							//转码处理
 							convertService.consumerMsg(processFileDTO);
 	                    }
 	                } catch (Exception e) {
-	                    e.printStackTrace();
+					 	logger.error("消费消息失败：{}",e.getMessage());
 	                    return ConsumeConcurrentlyStatus.RECONSUME_LATER; //稍后再试
 	                }
 	                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS; //消费成功
@@ -103,25 +107,35 @@ public class RocketmqConfiguration{
 		consumer.setConsumeMessageBatchMaxSize(10);
 		consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
 		consumer.subscribe("ConvertTopic", "*");
-		consumer.setMessageModel(MessageModel.CLUSTERING); //集群消费模式
+		consumer.setMessageModel(MessageModel.CLUSTERING); //集群消费模式，一个消息被消费后，不会再被别的节点消费
 		consumer.registerMessageListener(new MessageListenerConcurrently() {
 			@Override
 			public ConsumeConcurrentlyStatus consumeMessage(
 					List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
-				 try {
-	                    for (MessageExt messageExt : msgs) {
-	                        String messageBody = new String(messageExt.getBody(), "utf-8");
-	                        System.out.println("转码服务2 消费消息：Msg: " + messageExt.getMsgId() + ",msgBody: " + messageBody);//输出消息内容
-	                    }
-	                } catch (Exception e) {
-	                    e.printStackTrace();
-	                    return ConsumeConcurrentlyStatus.RECONSUME_LATER; //稍后再试
-	                }
-	                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS; //消费成功
+				try {
+					for (MessageExt messageExt : msgs) {
+						String messageBody = new String(messageExt.getBody(), "utf-8");
+						logger.info("转码服务,消费消息1：Msg: " + messageExt.getMsgId() + ",msgBody: " + messageBody);//输出消息内容
+						if(StringUtils.isBlank(messageBody)){
+							throw new ConvertException(ResultEnmu.MQ_MESSAGE_IS_NULL);
+						}
+						ProcessFileDTO processFileDTO = JSON.parseObject(messageBody, ProcessFileDTO.class);
+						//如果filePath中没有值，这条消息无用，返回消费成功，不再消费
+						if(StringUtils.isBlank(processFileDTO.getFilePath())){
+							return ConsumeConcurrentlyStatus.CONSUME_SUCCESS; //消费成功
+						}
+						//转码处理
+						convertService.consumerMsg(processFileDTO);
+					}
+				} catch (Exception e) {
+					logger.error("消费消息失败：{}",e.getMessage());
+					return ConsumeConcurrentlyStatus.RECONSUME_LATER; //稍后再试
+				}
+				return ConsumeConcurrentlyStatus.CONSUME_SUCCESS; //消费成功
 			}
-        });
-        consumer.start();
-	    return consumer;
+		});
+		consumer.start();
+		return consumer;
 	}*/
 
 }

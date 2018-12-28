@@ -60,6 +60,7 @@ public class ImageUtil {
             log.error("添加水印图片异常：{}",e.getMessage());
             throw new ConvertException(ResultEnmu.THUMBNAILS_FAIL);
         }
+        log.info(targetImg);
         return targetImg;
     }
 

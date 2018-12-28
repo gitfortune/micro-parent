@@ -30,16 +30,17 @@ public class ConvertController {
     private DefaultMQProducer defaultMQProducer;
 
     @RequestMapping("/convert_file")
-    public RestResponse convertFile(ProcessFileDTO processFileDTO){
+    public RestResponse convertFile(@RequestBody ProcessFileDTO processFileDTO){
         if(null == processFileDTO){
             throw new ConvertException(ResultEnmu.OBJ_IS_NULL);
         }
         try {
             String msg = JSON.toJSONString(processFileDTO);
 
-            Message sendMsg = new Message("ConvertTopic","mediaTag",msg.getBytes());
+            Message sendMsg = new Message("ConvertTopic","mediaTag",String.valueOf(System.currentTimeMillis()),msg.getBytes());
 
             defaultMQProducer.send(sendMsg);
+            log.info("消息发送成功：{}",msg);
         } catch (Exception e) {
             log.error("MQ发送消息失败：{}",e.getMessage());
             throw new ConvertException(ResultEnmu.MQ_SEND_MSG_FAIL);

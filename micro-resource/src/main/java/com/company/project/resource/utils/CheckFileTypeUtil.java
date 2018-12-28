@@ -98,20 +98,15 @@ public class CheckFileTypeUtil {
 
     public static int checkType(String str) {
         switch (str) {
-            case "FFD8FF":      //jpg
-                return PICTURE;
+            case "FFD8FF":          //jpg
+            case "FFD8FFE0":      //jpeg
             case "89504E47":    //png
-                return PICTURE;
             case "47494638":    //gif
-                return PICTURE;
             case "49492A00":    //tif
-                return PICTURE;
             case "424D":        //bmp
                 return PICTURE;
             case "57415645":    //wav
-                return AUDIO;
             case "4D414320":    //ape
-                return AUDIO;
             case "664C6143":    //flac
                 return AUDIO;
             case "52494646":    //wav,avi

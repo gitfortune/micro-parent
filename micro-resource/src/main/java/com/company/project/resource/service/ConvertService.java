@@ -5,6 +5,7 @@ import com.company.project.resource.dto.ProcessFileDTO;
 import com.company.project.resource.enmu.ResultEnmu;
 import com.company.project.resource.entity.MediaInfo;
 import com.company.project.resource.exception.ConvertException;
+import com.company.project.resource.http.HttpAPIService;
 import com.company.project.resource.utils.CheckFileTypeUtil;
 import com.company.project.resource.utils.FileUtil;
 import com.company.project.resource.utils.ImageUtil;
@@ -16,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 音视频转码服务，图片处理
@@ -30,12 +29,15 @@ public class ConvertService {
     @Autowired
     ConvertProperties properties;
 
+    @Autowired
+    HttpAPIService httpAPIService;
+
     /**
      * 转码前的判断
      * @param processFileDTO
      */
     public void consumerMsg(ProcessFileDTO processFileDTO){
-
+        String newPath;
         String filePath = processFileDTO.getFilePath();
 
         //使用checkType（）方法无法区分avi和wav，需要另作处理
@@ -52,18 +54,26 @@ public class ConvertService {
         //如果是音、视频，图片，进入处理程序
         if(fileType != CheckFileTypeUtil.UNKNOWN && fileType != CheckFileTypeUtil.EXPECT){
 
-            String newPath = this.process(fileType, processFileDTO);
-            //回调
+            newPath = this.process(fileType, processFileDTO);
+
 
         }else if(fileType == CheckFileTypeUtil.EXPECT){
             //MP3，MP4格式，不需要转码，如果大于xx M存入指定路径
-            this.checkSizeAndMove(processFileDTO);
+            newPath = this.checkSizeAndMove(processFileDTO);
         }else {
-            //回调
 
             //无法处理的未知类型
             log.error("转码服务：无法处理的未知类型：{}",filePath);
             throw new ConvertException(ResultEnmu.UNIDENTIFIED);
+        }
+        try {
+            Map map = new HashMap();
+            map.put("url",newPath);
+            httpAPIService.doPost("http://localhost:8090/callBack",map);
+            log.info("回调方法执行完毕！！！！！！！！！！！！！！！！！！！！！！！");
+        } catch (Exception e) {
+            log.error("回调方法出错：{}",e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -115,7 +125,7 @@ public class ConvertService {
      * 检查大小，然后根据大小移动到指定位置
      * @param processFileDTO
      */
-    public void checkSizeAndMove(ProcessFileDTO processFileDTO){
+    public String checkSizeAndMove(ProcessFileDTO processFileDTO){
         String filePath = processFileDTO.getFilePath();
         String fileName = new File(filePath).getName();
         MediaInfo mediaInfo = XuggleUtil.getMediaInfo(filePath);
@@ -128,7 +138,9 @@ public class ConvertService {
             }
             String descPath = properties.getContent()+fileName;
             FileUtil.move(filePath,descPath);
+            return descPath;
         }
+        return filePath;
     }
 
     /**
@@ -141,7 +153,7 @@ public class ConvertService {
         String srcImg = processFileDTO.getFilePath();
         String fileName = new File(srcImg).getName();
         String uuid = UUID.randomUUID().toString().replace("-", ""); //UUID
-        String targerImg = srcImg.replace(fileName,uuid);
+        String targerImg = srcImg.replace(fileName.substring(0,fileName.lastIndexOf(".")),uuid);
         //水印图片位置
         Positions positions = ImageUtil.checkPositions(processFileDTO.getPosition());
         String waterMarkPath = processFileDTO.getWaterMarkPath();   //水印路径
