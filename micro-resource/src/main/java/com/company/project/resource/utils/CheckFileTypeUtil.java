@@ -27,7 +27,6 @@ public class CheckFileTypeUtil {
     /**使用checkType（）方法无法区分avi和wav，先标记为容易混淆的，另作处理 */
     public static final int CONFUSING = 5;
 
-
     /**
      * 根据文件路径获取文件头信息
      *
@@ -94,7 +93,6 @@ public class CheckFileTypeUtil {
         log.info("检测到文件头：" + builder.toString());
         return builder.toString();
     }
-
 
     public static int checkType(String str) {
         switch (str) {

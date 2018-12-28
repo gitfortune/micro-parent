@@ -8,6 +8,8 @@ import com.company.project.resource.exception.ConvertException;
 import com.company.project.resource.service.ConvertService;
 import com.company.project.resource.utils.CheckFileTypeUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -16,21 +18,23 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@Api(value = "音视频转码服务，图片处理", tags = "ConvertApi", description="音视频转码服务，图片处理")
 @Slf4j
+@RestController
 @RequestMapping("/convert")
+@Api(value = "音视频转码服务，图片处理", tags = "ConvertApi", description="音视频转码服务，图片处理")
 public class ConvertController {
 
     @Autowired
     private DefaultMQProducer defaultMQProducer;
 
-    @RequestMapping("/convert_file")
-    public RestResponse convertFile(@RequestBody ProcessFileDTO processFileDTO){
+    @ApiOperation(value = "音视频转码服务调用接口", notes = "这个接口实现音视频转码，图片裁剪，加水印功能")
+    @PostMapping("/convert_file")
+    public RestResponse convertFile(@ApiParam(name = "processFileDTO",value = "传递参数封装的对象",required = true) @RequestBody ProcessFileDTO processFileDTO){
         if(null == processFileDTO){
             throw new ConvertException(ResultEnmu.OBJ_IS_NULL);
         }

@@ -56,7 +56,6 @@ public class ConvertService {
 
             newPath = this.process(fileType, processFileDTO);
 
-
         }else if(fileType == CheckFileTypeUtil.EXPECT){
             //MP3，MP4格式，不需要转码，如果大于xx M存入指定路径
             newPath = this.checkSizeAndMove(processFileDTO);
@@ -173,7 +172,6 @@ public class ConvertService {
         }
         return newImg;
     }
-
 
     /**
      * 视频转码

@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 
 public class XuggleUtil {
 
-
     /**
      * 获取媒体文件信息
      * @param filePath 文件路径
@@ -54,9 +53,7 @@ public class XuggleUtil {
         return mediaInfo;
     }
 
-
-
-    private static final String filename = "E:/videoMp4/13、spring boot使用thymeleaf_标清.mp4";
+    /*private static final String filename = "E:/videoMp4/13、spring boot使用thymeleaf_标清.mp4";
 
     public static void main(String[] args) {
 
@@ -126,5 +123,5 @@ public class XuggleUtil {
 
         }
 
-    }
+    }*/
 }
