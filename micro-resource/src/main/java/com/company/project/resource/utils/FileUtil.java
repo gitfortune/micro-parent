@@ -38,7 +38,7 @@ public class FileUtil {
     }
 
 
-    /*//传输慢
+    //传输慢
     public static void moveSlow(String src,String desc){
         long startTime = System.currentTimeMillis(); //获取开始时间
         File inputFile = new File(src);
@@ -64,5 +64,5 @@ public class FileUtil {
         }
         long endTime = System.currentTimeMillis(); //获取结束时间
         log.info("channel程序运行时间：" + (endTime - startTime) + "ms"); //输出程序运行时间
-    }*/
+    }
 }
